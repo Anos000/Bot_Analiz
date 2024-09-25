@@ -3,7 +3,10 @@ from telebot import types
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
+import matplotlib
 
+# Установка бэкэнда для рендеринга изображений
+matplotlib.use('Agg')
 
 bot = telebot.TeleBot('7702548527:AAH-xkmHniF9yw09gDtN_JX7tleKJLJjr4E')
 
@@ -41,7 +44,7 @@ def create_table_image(df, file_path):
     ax.axis('off')  # Отключаем оси для чистого отображения таблицы
 
     # Преобразуем данные DataFrame в строки с обрезкой текста
-    truncated_df = df.applymap(lambda x: truncate_text(str(x), max_len=15))
+    truncated_df = df.astype(str).apply(lambda col: col.map(lambda x: truncate_text(x, max_len=15)))
 
     # Создаем таблицу
     table = ax.table(cellText=truncated_df.values, colLabels=truncated_df.columns, cellLoc='center', loc='center')
