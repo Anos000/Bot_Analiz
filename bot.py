@@ -8,25 +8,21 @@ import matplotlib.pyplot as plt
 bot = telebot.TeleBot('7702548527:AAH-xkmHniF9yw09gDtN_JX7tleKJLJjr4E')
 
 
-@bot.message_handler(content_types=['text'])
-def get_text_messages(message):
+# Приветственное сообщение с меню
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    # Создаем объект клавиатуры
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
 
-    keyboard = types.InlineKeyboardMarkup()  # наша клавиатура
+    # Добавляем кнопки
+    item1 = types.KeyboardButton("Отправить CSV файл")
+    item2 = types.KeyboardButton("Информация о боте")
+    item3 = types.KeyboardButton("Контакты")
 
-    key_yes = types.InlineKeyboardButton(text='Да', callback_data='yes')  # кнопка «Да»
-    keyboard.add(key_yes)  # добавляем кнопку в клавиатуру
+    markup.add(item1, item2, item3)
 
-    key_no = types.InlineKeyboardButton(text='Нет', callback_data='no')
-    keyboard.add(key_no)
-
-    bot.send_message(message.from_user.id, text='Твоя моя понимать?', reply_markup=keyboard)
-
-@bot.callback_query_handler(func=lambda call: True)
-def callback_worker(call):
-    if call.data == "yes":
-        bot.send_message(call.message.chat.id, 'Пожалуйста, отправьте CSV файл для анализа.')
-    elif call.data == "no":
-        bot.send_message(call.message.chat.id, 'Ну ладно :(')
+    # Отправляем приветственное сообщение с кнопками
+    bot.send_message(message.chat.id, "Привет! Выберите опцию из меню:", reply_markup=markup)
 
 
 # Функция для ограничения текста в ячейках
@@ -62,6 +58,18 @@ def create_table_image(df, file_path):
     # Сохраняем изображение таблицы в файл с плотной обрезкой по границам
     plt.savefig(file_path, bbox_inches='tight', dpi=300)
     plt.close()
+
+# Обработчик текста
+@bot.message_handler(content_types=['text'])
+def handle_text(message):
+    if message.text == "Отправить CSV файл":
+        bot.send_message(message.chat.id, "Пожалуйста, загрузите файл в формате CSV.")
+    elif message.text == "Информация о боте":
+        bot.send_message(message.chat.id, "Этот бот обрабатывает CSV файлы, преобразует их в изображение и файл Excel.")
+    elif message.text == "Контакты":
+        bot.send_message(message.chat.id, "Связаться с нами можно по адресу: krutskih.nikita04@gmail.com")
+    else:
+        bot.send_message(message.chat.id, "Выберите опцию из меню.")
 
 
 # Обработчик загрузки файлов
