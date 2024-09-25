@@ -88,9 +88,15 @@ def handle_docs(message):
             image_path = os.path.join("downloads", "table_image.png")
             create_table_image(df.head(), image_path)
 
+            excel_path = os.path.join("downloads", f"{file_name.split('.')[0]}.xlsx")
+            df.to_excel(excel_path, index=False)  # Сохраняем DataFrame в Excel
+
             # Отправляем пользователю изображение с таблицей
             with open(image_path, 'rb') as image:
                 bot.send_photo(message.chat.id, image)
+                # Отправка Excel файла
+            with open(excel_path, 'rb') as excel_file:
+                bot.send_document(message.chat.id, excel_file)
         else:
             bot.send_message(message.chat.id, "Пожалуйста, загрузите файл в формате CSV.")
     except Exception as e:
